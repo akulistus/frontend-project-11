@@ -4,12 +4,15 @@ import onChange from "on-change";
 
 import resources from './locales/index';
 import { render } from "./renderer";
+import { requestRSS } from './requestRSS';
+import { parseRSS } from './parseRSS';
 
 import './styles.scss';
 
 const state = {
   validInput: true,
   links: [],
+  contents: [],
   error: '',
 };
 
@@ -37,6 +40,13 @@ const app = (watchedState) => {
       watchedState.errors = '';
       watchedState.links.push(url);
     })
+    .then(() => {
+      return requestRSS(url);
+    })
+    .then((data) => {
+      const rss = parseRSS(data.contents);
+      watchedState.contents.push(rss);
+    })
     .catch((err) => {
       watchedState.errors = err.errors[0];
     });
@@ -52,7 +62,7 @@ const runAsync = async () => {
     resources,
   });
 
-  const watchedState = onChange(state, (path, value) => render(path, value, i18nextInstance));
+  const watchedState = onChange(state, (path, value, prevValue) => render(path, value, prevValue, i18nextInstance));
 
   app(watchedState);
 };

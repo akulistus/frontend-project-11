@@ -1,7 +1,9 @@
-const render = (path, value, i18nextInstance) => {
+const render = (path, value, prevValue, i18nextInstance) => {
 	const input = document.querySelector('input');
 	const form = document.querySelector('form');
   const feedback = document.querySelector('.feedback');
+  const posts = document.querySelector('.posts');
+  const feeds = document.querySelector('.feeds');
 	switch (path) {
 		case 'errors':
       if (value === '') {
@@ -14,7 +16,11 @@ const render = (path, value, i18nextInstance) => {
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
       }
       break;
-    case 'error':
+    case 'contents':
+      if (!prevValue.length) {
+        const postsUl = document.createElement('ul');
+        const feedsUl = document.createElement('ul');
+      }
 
 	}
 };
