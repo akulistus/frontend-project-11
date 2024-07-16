@@ -25,12 +25,14 @@ const parseRSS = (content) => {
   const html = parser.parseFromString(content, 'text/html');
 
   const id = random.getNext();
-
+  let title;
+  let description;
+  let items;
   try {
-    const title = html.querySelector('title').innerText.replace('<![CDATA[', '').replace(']]>', '');
-    const description = html.querySelector('description').innerHTML.replace('<!--[CDATA[', '').replace(']]-->', '');
+    title = html.querySelector('title').innerText.replace('<![CDATA[', '').replace(']]>', '');
+    description = html.querySelector('description').innerHTML.replace('<!--[CDATA[', '').replace(']]-->', '');
   
-    const items = html.querySelectorAll('item');
+    items = html.querySelectorAll('item');
   } catch (e) {
     throw new Error('error3');
   }
