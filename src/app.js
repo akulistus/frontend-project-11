@@ -36,7 +36,7 @@ const app = (watchedState) => {
     const formData = new FormData(e.target);
     const url = formData.get('url');
     urlChecker.validate(url)
-    .then((result) => {
+    .then(() => {
       watchedState.errors = '';
       watchedState.links.push(url);
     })

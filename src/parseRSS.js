@@ -25,6 +25,7 @@ const parseRSS = (content) => {
   const html = parser.parseFromString(content, 'text/html');
 
   const id = random.getNext();
+
   let title;
   let description;
   let items;

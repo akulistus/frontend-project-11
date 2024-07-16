@@ -16,7 +16,7 @@ const render = (path, value, prevValue, i18nextInstance) => {
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
       }
       break;
-    case 'contents':
+    case 'contents': {
       if (!prevValue.length) {
         // create post elements
         const postCard = document.createElement('div');
@@ -73,7 +73,7 @@ const render = (path, value, prevValue, i18nextInstance) => {
         postLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
         const a = document.createElement('a');
-        a.href = cur.linkж
+        a.href = cur.link;
         a.classList.add('fw-bold');
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
@@ -89,6 +89,7 @@ const render = (path, value, prevValue, i18nextInstance) => {
         return acc;
       }, []);
       posts.querySelector('ul').prepend(...postsLi);
+    }
 	}
 };
 
