@@ -48,7 +48,8 @@ const app = (watchedState) => {
       watchedState.contents.push(rss);
     })
     .catch((err) => {
-      watchedState.errors = err.errors[0];
+      console.log(err.message);
+      watchedState.errors = err.message;
     });
   });
 };

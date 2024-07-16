@@ -7,3 +7,7 @@
 
 # Demo
 [click!](https://frontend-project-11-puce-ten.vercel.app/)
+
+# TODO
+ 1. Возвращать что-нибудь вместо Error
+ 2. Использовать регулярку в парсинге
