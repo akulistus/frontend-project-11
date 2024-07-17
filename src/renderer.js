@@ -16,20 +16,8 @@ const render = (path, value, prevValue, i18nextInstance) => {
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
       }
       break;
-    case 'contents': {
+    case 'feeds': {
       if (!prevValue.length) {
-        // create post elements
-        const postCard = document.createElement('div');
-        postCard.classList.add('card', 'border-0');
-        const postCardBody = document.createElement('div');
-        postCardBody.classList.add('card-body');
-        const postCardTitle = document.createElement('h2');
-        postCardTitle.classList.add('card-title', 'h4');
-        postCardTitle.textContent = 'Посты';
-        const postUl = document.createElement('ul');
-        postUl.classList.add('list-group', 'border-0', 'rounded-0');
-
-        // create feed elements
         const feedCard = document.createElement('div');
         feedCard.classList.add('card', 'border-0');
         const feedCardBody = document.createElement('div');
@@ -40,20 +28,11 @@ const render = (path, value, prevValue, i18nextInstance) => {
         const feedUl = document.createElement('ul');
         feedUl.classList.add('list-group', 'border-0', 'rounded-0');
 
-        // show feed elements
         feedCardBody.appendChild(feedCardTitle);
         feedCard.replaceChildren(feedCardBody, feedUl);
         feeds.appendChild(feedCard);
-
-        // show post elements
-        postCardBody.appendChild(postCardTitle);
-        postCard.replaceChildren(postCardBody, postUl);
-        posts.appendChild(postCard);
       }
-      
-      const newFeed = value.at(-1).feed;
-      const newPosts = value.at(-1).posts;
-      //create feed value
+      const newFeed = value.at(-1);
       const feedLi = document.createElement('li');
       feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
 
@@ -66,6 +45,27 @@ const render = (path, value, prevValue, i18nextInstance) => {
 
       feedLi.replaceChildren(feedTitle, feedDesc);
       feeds.querySelector('ul').prepend(feedLi);
+      break;
+    }
+    case 'posts': {
+      if (!prevValue.length) {
+        // create post elements
+        const postCard = document.createElement('div');
+        postCard.classList.add('card', 'border-0');
+        const postCardBody = document.createElement('div');
+        postCardBody.classList.add('card-body');
+        const postCardTitle = document.createElement('h2');
+        postCardTitle.classList.add('card-title', 'h4');
+        postCardTitle.textContent = 'Посты';
+        const postUl = document.createElement('ul');
+        postUl.classList.add('list-group', 'border-0', 'rounded-0');
+
+        // show post elements
+        postCardBody.appendChild(postCardTitle);
+        postCard.replaceChildren(postCardBody, postUl);
+        posts.appendChild(postCard);
+      }
+      const newPosts = value;
 
       // create posts values
       const postsLi = newPosts.reduce((acc, cur) => {
@@ -88,7 +88,8 @@ const render = (path, value, prevValue, i18nextInstance) => {
         acc.push(postLi);
         return acc;
       }, []);
-      posts.querySelector('ul').prepend(...postsLi);
+      posts.querySelector('ul').replaceChildren(...postsLi);
+      break;
     }
 	}
 };

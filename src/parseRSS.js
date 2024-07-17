@@ -1,8 +1,4 @@
-import Random from "./randomId";
-
-const random = new Random(5);
-
-const parseRSS = (content) => {
+const parseRSS = (content, id) => {
   // general return struct
   // const data = {
   //   feed: {
@@ -24,8 +20,6 @@ const parseRSS = (content) => {
   const parser = new DOMParser();
   const html = parser.parseFromString(content, 'text/html');
 
-  const id = random.getNext();
-
   let title;
   let description;
   let items;
@@ -43,6 +37,7 @@ const parseRSS = (content) => {
     const description = item.querySelector('description').innerHTML;
     const link = item.querySelector('guid').textContent;
     posts.push({
+      id,
       title,
       description,
       link,
