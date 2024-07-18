@@ -27,7 +27,7 @@ const parseRSS = (content) => {
   try {
     title = html.querySelector('title').innerText.replace('<![CDATA[', '').replace(']]>', '');
     description = html.querySelector('description').innerHTML.replace('<!--[CDATA[', '').replace(']]-->', '');
-  
+
     items = html.querySelectorAll('item');
   } catch (e) {
     throw new Error('error3');
@@ -39,7 +39,7 @@ const parseRSS = (content) => {
     const description = item.querySelector('description').innerHTML;
     const link = item.querySelector('guid').textContent;
     posts.push({
-      id:uniqueId,
+      id: uniqueId,
       title,
       description,
       link,
@@ -55,4 +55,4 @@ const parseRSS = (content) => {
   };
 };
 
-export { parseRSS };
+export default parseRSS;

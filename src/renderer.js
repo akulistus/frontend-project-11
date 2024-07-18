@@ -1,20 +1,22 @@
 const render = (originPath, value, prevValue, i18nextInstance, state) => {
   // получим имя измененного параметра для вложенных структур
   const path = originPath.split('.');
-	const input = document.querySelector('input');
-	const form = document.querySelector('form');
+  const input = document.querySelector('input');
+  const form = document.querySelector('form');
   const feedback = document.querySelector('.feedback');
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
-	switch (path.at(0)) {
-		case 'errors':
+  switch (path.at(0)) {
+    case 'errors':
       if (value === '') {
         input.classList.remove('is-invalid');
-        feedback.textContent = '';
+        feedback.classList.replace('text-danger', 'text-success');
+        feedback.textContent = i18nextInstance.t('success');
         form.reset();
         input.focus();
       } else {
         input.classList.add('is-invalid');
+        feedback.classList.replace('text-success', 'text-danger');
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
       }
       break;
@@ -42,7 +44,7 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       const feedDesc = document.createElement('p');
       feedTitle.classList.add('h6', 'm-0');
       feedTitle.textContent = newFeed.title;
-      feedDesc.classList.add('m-0','small', 'text-black-50');
+      feedDesc.classList.add('m-0', 'small', 'text-black-50');
       feedDesc.textContent = newFeed.description;
 
       feedLi.replaceChildren(feedTitle, feedDesc);
@@ -68,7 +70,6 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       const newPosts = state.posts;
 
       const postsLi = newPosts.reduce((acc, cur) => {
-
         const postLi = document.createElement('li');
         postLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -77,21 +78,21 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         a.dataset.id = cur.id;
 
         if (cur.seen) {
-          a.classList.add('fw-normal')
+          a.classList.add('fw-normal');
         } else {
           a.classList.add('fw-bold');
         }
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.textContent = cur.title;
-        
+
         const button = document.createElement('button');
         button.type = 'button';
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
         button.dataset.bsToggle = 'modal';
         button.dataset.bsTarget = '#modal';
         button.dataset.id = cur.id;
-        button.textContent = 'Просмотр';
+        button.textContent = i18nextInstance.t('button');
 
         postLi.replaceChildren(a, button);
         acc.push(postLi);
@@ -100,7 +101,7 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       posts.querySelector('ul').replaceChildren(...postsLi);
       break;
     }
-	}
+  }
 };
 
-export { render };
+export default render;
