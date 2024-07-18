@@ -1,4 +1,4 @@
-const parseRSS = (content, id) => {
+const parseRSS = (content) => {
   // general return struct
   // const data = {
   //   feed: {
@@ -9,12 +9,13 @@ const parseRSS = (content, id) => {
   //   posts: [],
   // };
 
-  // post obj structure
+  // general post structure
   // const post = {
   //   id: null,
   //   title: '',
   //   link: '',
-  //   description: ''
+  //   description: '',
+  //   seen: false,
   // };
 
   const parser = new DOMParser();
@@ -33,11 +34,12 @@ const parseRSS = (content, id) => {
   }
   const posts = [];
   items.forEach((item) => {
+    const uniqueId = Math.random() * 1000;
     const title = item.querySelector('title').textContent;
     const description = item.querySelector('description').innerHTML;
     const link = item.querySelector('guid').textContent;
     posts.push({
-      id,
+      id:uniqueId,
       title,
       description,
       link,
@@ -46,7 +48,6 @@ const parseRSS = (content, id) => {
 
   return {
     feed: {
-      id,
       title,
       description,
     },

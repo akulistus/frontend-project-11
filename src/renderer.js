@@ -1,10 +1,12 @@
-const render = (path, value, prevValue, i18nextInstance) => {
+const render = (originPath, value, prevValue, i18nextInstance, state) => {
+  // получим имя измененного параметра для вложенных структур
+  const path = originPath.split('.');
 	const input = document.querySelector('input');
 	const form = document.querySelector('form');
   const feedback = document.querySelector('.feedback');
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
-	switch (path) {
+	switch (path.at(0)) {
 		case 'errors':
       if (value === '') {
         input.classList.remove('is-invalid');
@@ -48,8 +50,7 @@ const render = (path, value, prevValue, i18nextInstance) => {
       break;
     }
     case 'posts': {
-      if (!prevValue.length) {
-        // create post elements
+      if (path.at(-1) !== 'seen' && !prevValue.length) {
         const postCard = document.createElement('div');
         postCard.classList.add('card', 'border-0');
         const postCardBody = document.createElement('div');
@@ -60,21 +61,26 @@ const render = (path, value, prevValue, i18nextInstance) => {
         const postUl = document.createElement('ul');
         postUl.classList.add('list-group', 'border-0', 'rounded-0');
 
-        // show post elements
         postCardBody.appendChild(postCardTitle);
         postCard.replaceChildren(postCardBody, postUl);
         posts.appendChild(postCard);
       }
-      const newPosts = value;
+      const newPosts = state.posts;
 
-      // create posts values
       const postsLi = newPosts.reduce((acc, cur) => {
+
         const postLi = document.createElement('li');
         postLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
         const a = document.createElement('a');
         a.href = cur.link;
-        a.classList.add('fw-bold');
+        a.dataset.id = cur.id;
+
+        if (cur.seen) {
+          a.classList.add('fw-normal')
+        } else {
+          a.classList.add('fw-bold');
+        }
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.textContent = cur.title;
@@ -82,6 +88,9 @@ const render = (path, value, prevValue, i18nextInstance) => {
         const button = document.createElement('button');
         button.type = 'button';
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+        button.dataset.bsToggle = 'modal';
+        button.dataset.bsTarget = '#modal';
+        button.dataset.id = cur.id;
         button.textContent = 'Просмотр';
 
         postLi.replaceChildren(a, button);
