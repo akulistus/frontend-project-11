@@ -12,13 +12,14 @@ import './styles.scss';
 
 setLocale({
   string: {
-    url: 'error1',
+    url: 'notValidLink',
   },
 });
 
 const app = (watchedState) => {
-  const urlChecker = string().url().test('is-new', 'error2', (value) => new Promise((resolve) => {
-    if (!watchedState.links.includes(value)) {
+  const urlChecker = string().url().test('is-new', 'RSSAleradyExists', (value) => new Promise((resolve) => {
+    const links = watchedState.feeds.map((feed) => feed.link);
+    if (!links.includes(value)) {
       resolve(true);
     }
     resolve(false);
@@ -33,15 +34,15 @@ const app = (watchedState) => {
     const url = formData.get('url');
 
     urlChecker.validate(url)
-      .then(() => {
-        watchedState.errors = '';
-        watchedState.links.push(url);
-      })
       .then(() => requestRSS(url))
       .then((data) => {
         const rss = parseRSS(data.contents);
-        watchedState.feeds.push(rss.feed);
+        watchedState.feeds.push({ ...rss.feed, link: url });
         watchedState.posts.push(...rss.posts);
+      })
+      .then(() => {
+        watchedState.errors = null;
+        watchedState.errors = '';
       })
       .catch((err) => {
         watchedState.errors = err.message;
@@ -50,7 +51,7 @@ const app = (watchedState) => {
 
   document.addEventListener('show.bs.modal', (e) => {
     const { id } = e.relatedTarget.dataset;
-    const post = watchedState.posts.find((item) => item.id == id);
+    const post = watchedState.posts.find((item) => item.id.toString() === id);
     e.target.querySelector('.modal-title').textContent = post.title;
     e.target.querySelector('.modal-body').textContent = post.description;
     e.target.querySelector('.full-article').href = post.link;
@@ -60,7 +61,7 @@ const app = (watchedState) => {
   document.addEventListener('click', (e) => {
     const { id } = e.target.dataset;
     if (id) {
-      const post = watchedState.posts.find((item) => item.id == id);
+      const post = watchedState.posts.find((item) => item.id.toString() === id);
       post.seen = true;
     }
   });
@@ -73,9 +74,10 @@ const comparator = (value, otherValue) => {
 };
 
 const checkRssForUpdates = (watchedState) => {
-  if (watchedState.links.length) {
+  const links = watchedState.feeds.map((feed) => feed.link);
+  if (links.length) {
     const totalNewEntries = [];
-    const promises = watchedState.links.map((link) => requestRSS(link)
+    const promises = links.map((link) => requestRSS(link)
       .then((data) => {
         const rss = parseRSS(data.contents);
         totalNewEntries.push(..._.differenceWith(rss.posts, watchedState.posts, comparator));
@@ -102,14 +104,14 @@ const runAsync = async () => {
 
   const state = {
     validInput: true,
-    links: [],
     feeds: [],
     posts: [],
-    error: '',
+    error: null,
   };
 
-  const watchedState = onChange(state, (path, value, prevValue) => 
-    render(path, value, prevValue, i18nextInstance, state));
+  const watchedState = onChange(state, (path, value, prevValue) => {
+    render(path, value, prevValue, i18nextInstance, state);
+  });
 
   app(watchedState);
   setTimeout(() => checkRssForUpdates(watchedState), 5000);

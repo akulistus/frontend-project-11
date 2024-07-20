@@ -14,7 +14,7 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         feedback.textContent = i18nextInstance.t('success');
         form.reset();
         input.focus();
-      } else {
+      } else if (value) {
         input.classList.add('is-invalid');
         feedback.classList.replace('text-success', 'text-danger');
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
@@ -100,6 +100,9 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       }, []);
       posts.querySelector('ul').replaceChildren(...postsLi);
       break;
+    }
+    default: {
+      throw new Error('unknownError');
     }
   }
 };

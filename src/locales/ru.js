@@ -3,10 +3,11 @@ export default ({
     success: 'RSS успешно загружен',
     button: 'Просмотр',
     errors: {
-      error1: 'Ссылка должна быть валидным URL',
-      error2: 'RSS уже существует',
-      error3: 'Ресурс не содержит валидный RSS',
-      error4: 'Ошибка сети',
+      notValidLink: 'Ссылка должна быть валидным URL',
+      notValidRSS: 'Ресурс не содержит валидный RSS',
+      RSSAleradyExists: 'RSS уже существует',
+      networkError: 'Ошибка сети',
+      unknownError: 'Неизвестная ошибка',
     },
   },
 });
