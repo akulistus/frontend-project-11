@@ -6,8 +6,8 @@ const parseRSS = (content) => {
     throw new Error('notValidRSS');
   }
 
-  const feedTitle = html.querySelector('title').innerText;
-  const feedDescription = html.querySelector('description').innerHTML;
+  const feedTitle = html.querySelector('title').textContent;
+  const feedDescription = html.querySelector('description').textContent;
   const feedItems = html.querySelectorAll('item');
 
   const posts = [];

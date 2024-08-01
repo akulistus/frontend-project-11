@@ -53,9 +53,9 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       const feedTitle = document.createElement('h3');
       const feedDesc = document.createElement('p');
       feedTitle.classList.add('h6', 'm-0');
-      feedTitle.textContent = newFeed.title;
+      feedTitle.textContent = newFeed.feedTitle;
       feedDesc.classList.add('m-0', 'small', 'text-black-50');
-      feedDesc.textContent = newFeed.description;
+      feedDesc.textContent = newFeed.feedDescription;
 
       feedLi.replaceChildren(feedTitle, feedDesc);
       feeds.querySelector('ul').prepend(feedLi);
