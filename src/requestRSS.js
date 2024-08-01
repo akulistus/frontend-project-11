@@ -1,9 +1,13 @@
 import axios from 'axios';
+import proxify from './proxify';
 
-const requestRSS = (url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
-  .then((response) => response.data)
-  .catch(() => {
-    throw new Error('networkError');
-  });
+const requestRSS = (url) => {
+  const proxiedUrl = proxify(url);
+  return axios.get(proxiedUrl)
+    .then((response) => response.data)
+    .catch(() => {
+      throw new Error('networkError');
+    });
+};
 
 export default requestRSS;

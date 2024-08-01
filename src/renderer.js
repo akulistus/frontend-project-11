@@ -1,13 +1,12 @@
 const render = (originPath, value, prevValue, i18nextInstance, state) => {
   // получим имя измененного параметра для вложенных структур
-  const path = originPath.split('.');
   const input = document.querySelector('input');
   const form = document.querySelector('form');
   const feedback = document.querySelector('.feedback');
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
-  switch (path.at(0)) {
-    case 'errors':
+  switch (originPath) {
+    case 'parseProcess.error':
       if (value === '') {
         input.classList.remove('is-invalid');
         feedback.classList.replace('text-danger', 'text-success');
@@ -20,6 +19,17 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         feedback.textContent = i18nextInstance.t(`errors.${value}`);
       }
       break;
+
+    case 'parseProcess.state': {
+      const button = document.querySelector('button[aria-label="add"]');
+      if (value === 'processing') {
+        button.setAttribute('disabled', '');
+      } else {
+        button.removeAttribute('disabled');
+      }
+      break;
+    }
+
     case 'feeds': {
       if (!prevValue.length) {
         const feedCard = document.createElement('div');
@@ -51,8 +61,9 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       feeds.querySelector('ul').prepend(feedLi);
       break;
     }
+
     case 'posts': {
-      if (path.at(-1) !== 'seen' && !prevValue.length) {
+      if (!prevValue.length) {
         const postCard = document.createElement('div');
         postCard.classList.add('card', 'border-0');
         const postCardBody = document.createElement('div');
@@ -77,11 +88,12 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         a.href = cur.link;
         a.dataset.id = cur.id;
 
-        if (cur.seen) {
-          a.classList.add('fw-normal');
-        } else {
+        if (!state.uiState.seenPosts.has(cur.id)) {
           a.classList.add('fw-bold');
+        } else {
+          a.classList.add('fw-normal');
         }
+
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.textContent = cur.title;
@@ -99,6 +111,14 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         return acc;
       }, []);
       posts.querySelector('ul').replaceChildren(...postsLi);
+      break;
+    }
+
+    case 'uiState.seenPosts': {
+      value.forEach((id) => {
+        const link = document.querySelector(`a[data-id="${id}"]`);
+        link.classList.replace('fw-bold', 'fw-normal');
+      });
       break;
     }
     default: {
