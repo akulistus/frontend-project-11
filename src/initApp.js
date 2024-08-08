@@ -4,7 +4,7 @@ import onChange from 'on-change';
 
 import { app, checkRssForUpdates } from './app';
 import resources from './locales/index';
-import render from './renderer';
+import render from './renderer/renderer';
 
 const initApp = () => {
   setLocale({

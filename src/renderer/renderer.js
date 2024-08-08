@@ -1,3 +1,5 @@
+import { createElement } from "./createElement";
+
 const render = (originPath, value, prevValue, i18nextInstance, state) => {
   // получим имя измененного параметра для вложенных структур
   const input = document.querySelector('input');
@@ -38,29 +40,15 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
     case 'feeds': {
       const mainUl = feeds.querySelector('ul');
       if (!mainUl) {
-        const feedCard = document.createElement('div');
-        feedCard.classList.add('card', 'border-0');
-        const feedCardBody = document.createElement('div');
-        feedCardBody.classList.add('card-body');
-        const feedCardTitle = document.createElement('h2');
-        feedCardTitle.classList.add('card-title', 'h4');
-        feedCardTitle.textContent = 'Фиды';
-        const feedUl = document.createElement('ul');
-        feedUl.classList.add('list-group', 'border-0', 'rounded-0');
-
-        feedCardBody.appendChild(feedCardTitle);
-        feedCard.replaceChildren(feedCardBody, feedUl);
+        const feedCard = createCard('Фиды');
         feeds.appendChild(feedCard);
       }
       const newFeed = value.at(-1);
-      const feedLi = document.createElement('li');
-      feedLi.classList.add('list-group-item', 'border-0', 'border-end-0');
+      const feedLi = createElement('li', ['list-group-item', 'border-0', 'border-end-0']);
 
-      const feedTitle = document.createElement('h3');
-      const feedDesc = document.createElement('p');
-      feedTitle.classList.add('h6', 'm-0');
+      const feedTitle = createElement('h3', ['h6', 'm-0']);
+      const feedDesc = createElement('p', ['m-0', 'small', 'text-black-50']);
       feedTitle.textContent = newFeed.title;
-      feedDesc.classList.add('m-0', 'small', 'text-black-50');
       feedDesc.textContent = newFeed.description;
 
       feedLi.replaceChildren(feedTitle, feedDesc);
@@ -71,25 +59,14 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
     case 'posts': {
       const mainUl = posts.querySelector('ul');
       if (!mainUl) {
-        const postCard = document.createElement('div');
-        postCard.classList.add('card', 'border-0');
-        const postCardBody = document.createElement('div');
-        postCardBody.classList.add('card-body');
-        const postCardTitle = document.createElement('h2');
-        postCardTitle.classList.add('card-title', 'h4');
-        postCardTitle.textContent = 'Посты';
-        const postUl = document.createElement('ul');
-        postUl.classList.add('list-group', 'border-0', 'rounded-0');
-
-        postCardBody.appendChild(postCardTitle);
-        postCard.replaceChildren(postCardBody, postUl);
+        const postCard = createCard('Посты');
         posts.appendChild(postCard);
       }
       const newPosts = state.posts;
 
       const postsLi = newPosts.reduce((acc, cur) => {
-        const postLi = document.createElement('li');
-        postLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+        const classes = ['list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0'];
+        const postLi = createElement('li', classes);
 
         const a = document.createElement('a');
         a.href = cur.link;
@@ -105,9 +82,8 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
         a.rel = 'noopener noreferrer';
         a.textContent = cur.title;
 
-        const button = document.createElement('button');
+        const button = document.createElement('button', ['btn', 'btn-outline-primary', 'btn-sm']);
         button.type = 'button';
-        button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
         button.dataset.bsToggle = 'modal';
         button.dataset.bsTarget = '#modal';
         button.dataset.id = cur.id;
@@ -128,10 +104,19 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       });
       break;
     }
-    // default: {
-    //   throw new Error('unknownError');
-    // }
   }
+};
+
+const createCard = (name) => {
+  const card = createElement('div', ['card', 'border-0']);
+  const cardBody = createElement('div', ['card-body']);
+  const cardTitle = createElement('h2', ['card-title', 'h4']);
+  const ul = createElement('ul', ['list-group', 'border-0', 'rounded-0']);
+  cardTitle.textContent = name;
+
+  cardBody.appendChild(cardTitle);
+  card.replaceChildren(cardBody, ul);
+  return card;
 };
 
 export default render;
