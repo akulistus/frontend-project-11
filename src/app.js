@@ -1,10 +1,6 @@
-import i18n from 'i18next';
 import * as _ from 'lodash';
-import { string, setLocale } from 'yup';
-import onChange from 'on-change';
+import { string } from 'yup';
 
-import resources from './locales/index';
-import render from './renderer';
 import requestRSS from './requestRSS';
 import parseRSS from './parseRSS';
 
@@ -20,23 +16,23 @@ const app = (watchedState) => {
     const formData = new FormData(e.target);
     const url = formData.get('url');
 
-    watchedState.parseProcess.state = 'processing';
+    watchedState.uiState.status = 'processing';
 
     urlChecker.validate(url)
       .then(() => requestRSS(url))
       .then((data) => {
-        const { feedTitle, feedDescription, posts } = parseRSS(data.contents);
-        posts.forEach((post) => { post.id = _.uniqueId(); });
+        const { title, description, items } = parseRSS(data.contents);
+        items.forEach((post) => { post.id = _.uniqueId(); });
 
-        watchedState.feeds.push({ feedTitle, feedDescription, link: url });
-        watchedState.posts.push(...posts);
-        watchedState.parseProcess.error = null;
-        watchedState.parseProcess.error = '';
+        watchedState.feeds.push({ title, description, link: url });
+        watchedState.posts.push(...items);
+        watchedState.uiState.errorMessage = '';
+        watchedState.uiState.status = 'success';
       })
       .catch((err) => {
-        watchedState.parseProcess.error = err.message;
-      })
-      .finally(() => { watchedState.parseProcess.state = 'processed'; });
+        watchedState.uiState.errorMessage = err.message;
+        watchedState.uiState.status = 'error';
+      });
   });
 
   const mainContainer = document.querySelector('.container-xxl');
@@ -44,10 +40,7 @@ const app = (watchedState) => {
     const { tagName } = e.target;
     if (tagName === 'BUTTON') {
       const { id } = e.target.previousElementSibling.dataset;
-      const post = watchedState.posts.find((item) => item.id.toString() === id);
-      document.querySelector('.modal-title').textContent = post.title;
-      document.querySelector('.modal-body').textContent = post.description;
-      document.querySelector('.full-article').href = post.link;
+      watchedState.uiState.currentPostId = id;
       watchedState.uiState.seenPosts.add(id);
     } else if (tagName === 'A') {
       const { id } = e.target.dataset;
@@ -64,63 +57,21 @@ const comparator = (value, otherValue) => {
 
 const checkRssForUpdates = (watchedState) => {
   const links = watchedState.feeds.map((feed) => feed.link);
-  if (links.length) {
-    const totalNewEntries = [];
-    const promises = links.map((link) => requestRSS(link)
-      .then((data) => {
-        const rss = parseRSS(data.contents);
-        totalNewEntries.push(..._.differenceWith(rss.posts, watchedState.posts, comparator));
-      }));
+  const promises = links.map((link) => requestRSS(link)
+    .then((data) => {
+      const rss = parseRSS(data.contents);
+      return _.differenceWith(rss.posts, watchedState.posts, comparator);
+    }));
 
-    Promise.all(promises)
-      .then(() => {
-        if (totalNewEntries.length) {
-          watchedState.posts.push(...totalNewEntries);
-        }
-      })
-      .finally(() => {
-        setTimeout(() => checkRssForUpdates(watchedState), 5000);
-      });
-  }
-};
-
-const run = () => {
-  setLocale({
-    string: {
-      url: 'notValidLink',
-    },
-    mixed: {
-      notOneOf: 'RSSAleradyExists',
-    },
-  });
-
-  const state = {
-    parseProcess: {
-      state: 'processed', // processing
-      error: null,
-    },
-    uiState: {
-      seenPosts: new Set(),
-    },
-    feeds: [],
-    posts: [],
-  };
-
-  const i18nextInstance = i18n.createInstance();
-
-  i18nextInstance.init({
-    lng: 'ru',
-    debug: true,
-    resources,
-  })
-    .then(() => {
-      const watchedState = onChange(state, (path, value, prevValue) => {
-        render(path, value, prevValue, i18nextInstance, state);
-      });
-
-      app(watchedState);
-      checkRssForUpdates(watchedState);
+  Promise.all(promises)
+    .then((values) => {
+      if (values.flat().length) {
+        watchedState.posts.push(...values.flat());
+      }
+    })
+    .finally(() => {
+      setTimeout(() => checkRssForUpdates(watchedState), 5000);
     });
 };
 
-export default run;
+export { app, checkRssForUpdates };

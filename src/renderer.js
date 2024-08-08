@@ -1,37 +1,43 @@
 const render = (originPath, value, prevValue, i18nextInstance, state) => {
   // получим имя измененного параметра для вложенных структур
   const input = document.querySelector('input');
+  const submitButton = document.querySelector('button[aria-label="add"]');
   const form = document.querySelector('form');
   const feedback = document.querySelector('.feedback');
   const posts = document.querySelector('.posts');
   const feeds = document.querySelector('.feeds');
   switch (originPath) {
-    case 'parseProcess.error':
-      if (value === '') {
+    case 'uiState.status': {
+      if (value !== 'processing') {
+        submitButton.disabled = false;
+        input.disabled = false;
+      }
+      if (value === 'success') {
         input.classList.remove('is-invalid');
         feedback.classList.replace('text-danger', 'text-success');
         feedback.textContent = i18nextInstance.t('success');
         form.reset();
         input.focus();
-      } else if (value) {
+      } else if (value === 'error') {
         input.classList.add('is-invalid');
         feedback.classList.replace('text-success', 'text-danger');
-        feedback.textContent = i18nextInstance.t(`errors.${value}`);
-      }
-      break;
-
-    case 'parseProcess.state': {
-      const button = document.querySelector('button[aria-label="add"]');
-      if (value === 'processing') {
-        button.setAttribute('disabled', '');
-      } else {
-        button.removeAttribute('disabled');
+        feedback.textContent = i18nextInstance.t(`errors.${state.uiState.errorMessage}`);
+      } else if (value === 'processing') {
+        submitButton.disabled = true;
+        input.disabled = true;
       }
       break;
     }
-
+    case 'uiState.currentPostId': {
+      const post = state.posts.find((item) => item.id.toString() === value);
+      document.querySelector('.modal-title').textContent = post.title;
+      document.querySelector('.modal-body').textContent = post.description;
+      document.querySelector('.full-article').href = post.link;
+      break;
+    }
     case 'feeds': {
-      if (!prevValue.length) {
+      const mainUl = feeds.querySelector('ul');
+      if (!mainUl) {
         const feedCard = document.createElement('div');
         feedCard.classList.add('card', 'border-0');
         const feedCardBody = document.createElement('div');
@@ -53,9 +59,9 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       const feedTitle = document.createElement('h3');
       const feedDesc = document.createElement('p');
       feedTitle.classList.add('h6', 'm-0');
-      feedTitle.textContent = newFeed.feedTitle;
+      feedTitle.textContent = newFeed.title;
       feedDesc.classList.add('m-0', 'small', 'text-black-50');
-      feedDesc.textContent = newFeed.feedDescription;
+      feedDesc.textContent = newFeed.description;
 
       feedLi.replaceChildren(feedTitle, feedDesc);
       feeds.querySelector('ul').prepend(feedLi);
@@ -63,7 +69,8 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
     }
 
     case 'posts': {
-      if (!prevValue.length) {
+      const mainUl = posts.querySelector('ul');
+      if (!mainUl) {
         const postCard = document.createElement('div');
         postCard.classList.add('card', 'border-0');
         const postCardBody = document.createElement('div');
@@ -121,9 +128,9 @@ const render = (originPath, value, prevValue, i18nextInstance, state) => {
       });
       break;
     }
-    default: {
-      throw new Error('unknownError');
-    }
+    // default: {
+    //   throw new Error('unknownError');
+    // }
   }
 };
 

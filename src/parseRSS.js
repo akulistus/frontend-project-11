@@ -6,26 +6,25 @@ const parseRSS = (content) => {
     throw new Error('notValidRSS');
   }
 
-  const feedTitle = html.querySelector('title').textContent;
-  const feedDescription = html.querySelector('description').textContent;
-  const feedItems = html.querySelectorAll('item');
+  const title = html.querySelector('title').textContent;
+  const description = html.querySelector('description').textContent;
+  const rawItems = [...html.querySelectorAll('item')];
 
-  const posts = [];
-  feedItems.forEach((item) => {
-    const postTitle = item.querySelector('title').textContent;
-    const postDescription = item.querySelector('description').innerHTML;
-    const postLink = item.querySelector('guid').textContent;
-    posts.push({
-      title: postTitle,
-      description: postDescription,
-      link: postLink,
-    });
+  const items = rawItems.map((item) => {
+    const itemTitle = item.querySelector('title').textContent;
+    const itemDescription = item.querySelector('description').innerHTML;
+    const itemLink = item.querySelector('guid').textContent;
+    return {
+      title: itemTitle,
+      description: itemDescription,
+      link: itemLink,
+    };
   });
 
   return {
-    feedTitle,
-    feedDescription,
-    posts,
+    title,
+    description,
+    items,
   };
 };
 
